@@ -34,7 +34,7 @@ async def scrape_mercadopago(page) -> list[dict]:
     """Scrapea beneficios de Mercado Pago"""
     promos = []
     try:
-        await page.goto('https://www.mercadopago.com.ar/benefits', timeout=30000)
+        await page.goto('https://promociones.mercadopago.com.ar/', timeout=30000)
         await page.wait_for_selector('.benefits-card, [data-testid="benefit-card"], .benefit__title', timeout=15000)
         
         cards = await page.query_selector_all('.benefits-card, [class*="benefit"], [class*="promo"]')
@@ -60,7 +60,7 @@ async def scrape_uala(page) -> list[dict]:
     """Scrapea beneficios de Ualá"""
     promos = []
     try:
-        await page.goto('https://www.uala.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.uala.com.ar/promociones', timeout=30000)
         await page.wait_for_timeout(4000)
         
         cards = await page.query_selector_all('[class*="benefit"], [class*="promo"], [class*="card"]')
@@ -86,7 +86,7 @@ async def scrape_naranja(page) -> list[dict]:
     """Scrapea beneficios de Naranja X"""
     promos = []
     try:
-        await page.goto('https://www.naranjax.com/beneficios', timeout=30000)
+        await page.goto('https://www.naranjax.com/promociones/', timeout=30000)
         await page.wait_for_timeout(4000)
         
         items = await page.query_selector_all('[class*="benefit"], [class*="promotion"], article')
@@ -112,7 +112,7 @@ async def scrape_bna(page) -> list[dict]:
     """Scrapea beneficios del Banco Nación"""
     promos = []
     try:
-        await page.goto('https://www.bna.com.ar/Personas/Beneficios', timeout=30000)
+        await page.goto('https://semananacion.com.ar/semananacion', timeout=30000)
         await page.wait_for_timeout(5000)
         
         items = await page.query_selector_all('.beneficio, [class*="benefit"], .card-beneficio, article')
@@ -164,7 +164,7 @@ async def scrape_santander(page) -> list[dict]:
     """Scrapea beneficios de Santander"""
     promos = []
     try:
-        await page.goto('https://www.santander.com.ar/banco/online/ofertas', timeout=30000)
+        await page.goto('https://www.santander.com.ar/personas/beneficios', timeout=30000)
         await page.wait_for_timeout(5000)
         
         items = await page.query_selector_all('[class*="oferta"], [class*="promo"], [class*="benefit"], article')
@@ -190,7 +190,7 @@ async def scrape_galicia(page) -> list[dict]:
     """Scrapea beneficios de Galicia"""
     promos = []
     try:
-        await page.goto('https://www.galicia.ar/es/personas/beneficios', timeout=30000)
+        await page.goto('https://www.galicia.ar/personas/promociones', timeout=30000)
         await page.wait_for_timeout(5000)
         
         items = await page.query_selector_all('[class*="beneficio"], [class*="promo"], [class*="benefit"]')
@@ -216,7 +216,7 @@ async def scrape_modo(page) -> list[dict]:
     """Scrapea beneficios de MODO"""
     promos = []
     try:
-        await page.goto('https://www.modo.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.modo.com.ar/promos', timeout=30000)
         await page.wait_for_timeout(4000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="promo"], [class*="card"], article')
@@ -242,7 +242,7 @@ async def scrape_personal_pay(page) -> list[dict]:
     """Scrapea beneficios de Personal Pay"""
     promos = []
     try:
-        await page.goto('https://www.personalpay.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.personal.com.ar/pay/beneficios', timeout=30000)
         await page.wait_for_timeout(4000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="promo"], article')
@@ -294,7 +294,7 @@ async def scrape_hsbc(page) -> list[dict]:
     """Scrapea beneficios de HSBC Argentina"""
     promos = []
     try:
-        await page.goto('https://www.hsbc.com.ar/beneficios/', timeout=30000)
+        await page.goto('https://www.beneficios.icbc.com.ar/', timeout=30000)
         await page.wait_for_timeout(5000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="promo"], article, .card')
@@ -320,7 +320,7 @@ async def scrape_ciudad(page) -> list[dict]:
     """Scrapea beneficios del Banco Ciudad"""
     promos = []
     try:
-        await page.goto('https://www.bancociudad.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.bancociudad.com.ar/beneficios/', timeout=30000)
         await page.wait_for_timeout(5000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="beneficio"], [class*="promo"], article')
@@ -346,7 +346,7 @@ async def scrape_provincia(page) -> list[dict]:
     """Scrapea beneficios del Banco Provincia (Cuenta DNI también aplica)"""
     promos = []
     try:
-        await page.goto('https://www.bancoprovincia.com.ar/Beneficios', timeout=30000)
+        await page.goto('https://www.bancoprovincia.com.ar/cuentadni/contenidos/cdnibeneficios/', timeout=30000)
         await page.wait_for_timeout(5000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="beneficio"], [class*="promo"], article')
@@ -372,7 +372,7 @@ async def scrape_supervielle(page) -> list[dict]:
     """Scrapea beneficios de Supervielle"""
     promos = []
     try:
-        await page.goto('https://www.supervielle.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.supervielle.com.ar/personas/beneficios/descuentos', timeout=30000)
         await page.wait_for_timeout(5000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="beneficio"], [class*="promo"], article')
@@ -398,7 +398,7 @@ async def scrape_icbc(page) -> list[dict]:
     """Scrapea beneficios de ICBC Argentina"""
     promos = []
     try:
-        await page.goto('https://www.icbc.com.ar/beneficios', timeout=30000)
+        await page.goto('https://www.beneficios.icbc.com.ar/', timeout=30000)
         await page.wait_for_timeout(5000)
 
         items = await page.query_selector_all('[class*="benefit"], [class*="beneficio"], [class*="promo"], article')
