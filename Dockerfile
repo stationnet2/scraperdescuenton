@@ -1,21 +1,18 @@
-FROM python:3.11-slim
-
-# Instalar dependencias del sistema para Playwright
-RUN apt-get update && apt-get install -y \
-    wget curl gnupg \
-    libnss3 libatk1.0-0 libatk-bridge2.0-0 \
-    libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
-    libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 \
-    && rm -rf /var/lib/apt/lists/*
+# Imagen oficial de Playwright: ya incluye Chromium + todas las
+# dependencias del sistema correctas. Evita los errores de paquetes
+# faltantes (ttf-unifont, ttf-ubuntu-font-family) que aparecen al usar
+# python:3.11-slim, cuyo Debian base (Trixie) todavía no está soportado
+# por Playwright.
+FROM mcr.microsoft.com/playwright/python:v1.48.0-jammy
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Instalar browsers de Playwright
+# Chromium y sus dependencias ya vienen instalados en la imagen base,
+# pero lo dejamos por si el requirements.txt fija otra versión de Playwright.
 RUN playwright install chromium
-RUN playwright install-deps chromium
 
 COPY . .
 
