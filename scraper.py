@@ -228,8 +228,15 @@ async def fetch_comercios_cuentadni(id_buscador: int, localidad: str) -> list[di
     """Llama directo a la API de Banco Provincia y trae los comercios de una localidad"""
     url = f'https://www.bancoprovincia.com.ar/cuentadni/Home/GetLocalesListadoByIdBuscador?idBuscador={id_buscador}'
     payload = {'localidad': localidad}
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer': 'https://www.bancoprovincia.com.ar/cuentadni/buscadores/comerciosdebarrio',
+        'Origin': 'https://www.bancoprovincia.com.ar',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+    }
 
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with httpx.AsyncClient(timeout=20, headers=headers) as client:
         try:
             resp = await client.post(url, data=payload)
             resp.raise_for_status()
