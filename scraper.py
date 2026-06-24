@@ -225,26 +225,52 @@ def mapear_categoria(rubro: str) -> str:
 
 
 async def fetch_comercios_cuentadni(id_buscador: int, localidad: str) -> list[dict]:
-    """Llama directo a la API de Banco Provincia y trae los comercios de una localidad"""
-    url = f'https://www.bancoprovincia.com.ar/cuentadni/Home/GetLocalesListadoByIdBuscador?idBuscador={id_buscador}'
-    payload = {'localidad': localidad}
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://www.bancoprovincia.com.ar/cuentadni/buscadores/comerciosdebarrio',
-        'Origin': 'https://www.bancoprovincia.com.ar',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-    }
+    """
+    Navega el buscador con Playwright para obtener la cookie de sesión ASP.NET,
+    luego hace el POST a la API con esa cookie (necesaria para que no devuelva 500).
+    """
+    url_buscador = 'https://www.bancoprovincia.com.ar/cuentadni/buscadores/comerciosdebarrio'
+    url_api = f'https://www.bancoprovincia.com.ar/cuentadni/Home/GetLocalesListadoByIdBuscador?idBuscador={id_buscador}'
 
-    async with httpx.AsyncClient(timeout=20, headers=headers) as client:
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+        )
+        context = await browser.new_context(
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        )
+        page = await context.new_page()
         try:
-            resp = await client.post(url, data=payload)
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get('data', [])
+            # Navegar la página para que el server genere la sesión ASP.NET
+            await page.goto(url_buscador, timeout=30000, wait_until='domcontentloaded')
+            await page.wait_for_timeout(2000)
+
+            # Extraer cookies del contexto Playwright y armar el header
+            cookies = await context.cookies()
+            cookie_header = '; '.join(f'{c["name"]}={c["value"]}' for c in cookies)
+
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Referer': url_buscador,
+                'Origin': 'https://www.bancoprovincia.com.ar',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'Cookie': cookie_header,
+            }
+
+            async with httpx.AsyncClient(timeout=20, headers=headers) as client:
+                resp = await client.post(url_api, data={'localidad': localidad})
+                resp.raise_for_status()
+                data = resp.json()
+                return data.get('data', [])
+
         except Exception as e:
             print(f'  Cuenta DNI API error ({localidad}, buscador {id_buscador}): {e}')
             return []
+        finally:
+            await page.close()
+            await browser.close()
 
 
 def comercio_cuentadni_valido(c: dict) -> bool:
@@ -855,8 +881,6 @@ async def main():
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             viewport={'width': 1280, 'height': 720},
         )
-        page = await context.new_page()
-
         scrapers = [
             ('Mercado Pago',    scrape_mercadopago),
             ('Ualá',            scrape_uala),
@@ -880,12 +904,15 @@ async def main():
 
         for nombre, scraper_fn in scrapers:
             print(f'  Scrapeando {nombre}...')
+            page = await context.new_page()  # página nueva por scraper — evita "interrupted by navigation"
             try:
                 promos = await scraper_fn(page)
                 print(f'  ✅ {nombre}: {len(promos)} promos encontradas')
                 all_promos.extend(promos)
             except Exception as e:
                 print(f'  ❌ {nombre}: {e}')
+            finally:
+                await page.close()
 
         await browser.close()
 
