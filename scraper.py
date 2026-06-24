@@ -181,8 +181,8 @@ async def scrape_cuentadni(page) -> list[dict]:
         await page.wait_for_timeout(5000)
         
         # Screenshot de debug (opcional - descomentar para ver qué ve el scraper)
-        # await page.screenshot(path='debug_cuentadni.png', full_page=True)
-        # print('  → Screenshot guardado en debug_cuentadni.png')
+        await page.screenshot(path='debug_cuentadni.png', full_page=True)
+        print('  → Screenshot guardado en debug_cuentadni.png')
         
         # Selectores específicos para Cuenta DNI
         items = await page.query_selector_all(
